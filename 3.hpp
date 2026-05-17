@@ -78,7 +78,7 @@ public:
     {}
 
 
-    LivingCharacter(const LivingCharacter %lc)
+    LivingCharacter(const LivingCharacter &lc)
         : Character(lc), health(lc.health), maxHealth(lc.maxHealth)
     {
         std::cout << "LivingCharacter copy constructor called" << std::endl;
@@ -113,5 +113,175 @@ public:
         }
     }
 
+
+    unsigned getHealth() const { return health; }
+
+    unsigned getMaxHealth() const { return maxHealth; }
+
+    std::string getClassName() const override {return "LivingCharacter"; }
+};
+
+
+class Warrior : virtual public LivingCharacter
+{
+public:
+    Warrior(const std::string& name_p, unsigned health_p, unsigned physical_damage_p)
+        : LivingCharacter(name_p, health_p, health_p, physical_damage_p){
+            std::cout << "Warrior " << name_p << " has been created" << std::endl;
+        }
     
+
+    Warrior(const Warrior &w) : LivingCharacter(w){
+        std::cout << "Warrior copy constructor called" << std::endl;
+    }
+
+    Warrior& operator=(const Warrior &w) {
+        if (this != &w) {
+            LivingCharacter::operator=(w);
+        }
+        return *this;
+    }
+
+    int attack() override {
+        if (!isAlive()) {
+            std::cout << getName() << " is dead and cannot attack!" << std::endl;
+            return 0;
+        }
+
+        std::cout << getName() << " deals physical damage: " << damage << std::endl;
+        addDamage(damage);
+        return damage;
+    }
+
+    std::string getClassName() const override { return "Warrior"; }
+};
+
+
+class Mage : virtual public LivingCharacter
+{
+private:
+    unsigned maxMana;
+
+protected:
+    unsigned mana;
+    unsigned spellCost;
+
+public:
+    Mage(const std::string& name_p, unsigned health_p, unsigned magic_damage_p,
+        unsigned mana_p, unsigned spell_cost_p)
+        : LivingCharacter(name_p, health_p, health_p, magic_damage_p),
+        mana(mana_p), maxMana(mana_p), spellCost(spell_cost_p)
+        {
+            std::cout << "Mage " << name_p << " has been created" << std::endl;
+        }
+
+    Mage(const Mage &m) : LivingCharacter(m), mana(m.mana), maxMana(m.maxMana), spellCost(m.spellCost)
+    {
+        std::cout << "Mage copy constructor called" << std::endl;
+    }
+
+    Mage& operator=(const Mage &m) {
+        if (this != &m) {
+            LivingCharacter::operator=(m);
+            mana = m.mana;
+            maxMana = m.maxMana;
+            spellCost = m.spellCost;
+        }
+        return *this;
+    }
+
+    bool hasEnoughMana() const {
+        return mana >= spellCost;
+    }
+
+    int attack() override {
+        if(!isAlive()) {
+            std::cout << getName() << " is dead and cannot attack!" << std::endl;
+            return 0;
+        }
+
+        if (!hasEnoughMana()) {
+            std::cout << getName() << " doesn't have enough mana!" << std::endl;
+            return 0;
+        }
+
+        mana -= spellCost;
+        std::cout << getName() << " casts a spell for " << damage << " magic damage! Mana left: " << mana << std::endl;
+        addDamage(damage);
+        return damage;
+    }
+
+    unsigned getMana() const { return mana; }
+
+    unsigned getMaxMana() const {return maxMana; }
+
+    std::string getClassName() const override { return "Mage"; }
+};
+
+
+class Battlemage : public Warrior, public Mage
+{
+public:
+    Battlemage(const std::string& name_p, unsigned health_p, unsigned physical_damage_p, 
+               unsigned magic_damage_p, unsigned mana_p, unsigned spell_cost_p) 
+        : LivingCharacter(name_p, health_p, health_p, 0),
+          Warrior(name_p, health_p, physical_damage_p),
+          Mage(name_p, health_p, magic_damage_p, mana_p, spell_cost_p)
+    {
+        Warrior::damage = physical_damage_p;
+        Mage::damage = magic_damage_p;
+        std::cout << "Battlemage " << name_p << " has been created" << std::endl;
+    }
+
+    Battlemage(const Battlemage &bm)
+        : LivingCharacter(bm), Warrior(bm), Mage(bm)
+    {
+        std::cout << "Battlemage copy constructor called" << std::endl;
+    }
+
+    Battlemage& operator=(const Battlemage &bm) {
+        if (this != &bm) {
+            Warrior::operator=(bm);
+            Mage::operator=(bm);
+        }
+        return *this;
+    }
+
+    int attack() override {
+        return physicalAttack();
+    }
+
+    int physicalAttack() {
+        if (!isAlive()) {
+            std::cout << getName() << " is dead and cannot attack!" << std::endl;
+            return 0;
+        }
+        std::cout << getName() << " deals physical damage: " << Warrior::damage << std::endl;
+        addDamage(Warrior::damage);
+        return Warrior::damage;
+    }
+
+    int magicAttack() {
+        if (!isAlive()) {
+            std::cout << getName() << " is dead and cannot attack!" << std::endl;
+            return 0;
+        }
+
+        if (!hasEnoughMana()) {
+            std::cout << getName() << " doesn't have enough mana!" << std::endl;
+            return 0;
+        }
+
+        mana -= spellCost;
+        std::cout << getName() << " casts a spell for " << Mage::damage << " magic damage! Mana left: " << mana << std::endl;
+        addDamage(Mage::damage);
+        return Mage::damage;
+    }
+
+    std::string getClassName() const override { return "Battlemage"; }
+};
+
+int Character::totalDamageDealt = 0;
+Character* Character::topDamageDealer = nullptr;
+
 #endif // RPG_CHARACTERS_HPP
