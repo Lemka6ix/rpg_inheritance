@@ -57,3 +57,61 @@ public:
     static Character* getTopDamageDealer() { return topDamageDealer; }
 
 protected:
+    void addDamage(int amount){
+        personalDamageDealt += amount;
+        totalDamageDealt += amount;
+        if(!topDamageDealer || personalDamageDealt > topDamageDealer->personalDamageDealt){
+            topDamageDealer = this;
+        }
+    }
+};
+
+
+class LivingCharacter : public Character {
+protected:
+    unsigned health;
+    unsigned maxHealth;
+    
+public:
+    LivingCharacter(const std::string& name_p, unsigned health_p, unsigned max_health_p, int dmg)
+        : Character(name_p, true, dmg), health(health_p), maxHealth(max_health_p)
+    {}
+
+
+    LivingCharacter(const LivingCharacter %lc)
+        : Character(lc), health(lc.health), maxHealth(lc.maxHealth)
+    {
+        std::cout << "LivingCharacter copy constructor called" << std::endl;
+    }
+
+
+    LivingCharacter& operator=(const LivingCharacter &lc) {
+        if (this != &lc) {
+            Character::operator=(lc);
+            health = lc.health;
+            maxHealth = lc.maxHealth;
+        }
+        return *this;
+    }
+
+    bool isAlive() const override {
+        return health > 0;
+    }
+
+    void takeDamage(int damage) override {
+        if (damage > 0 && health > 0) {
+            if (damage > static_cast<int>(health)) {
+                health = 0;
+            } else {
+                health -= damage;
+            }
+            std::cout << getName() << " took " << damage << " damage. HP: " << health << std::endl;
+
+            if (health == 0) {
+                std::cout << getName() << " died :(" << std::endl;
+            }
+        }
+    }
+
+    
+#endif // RPG_CHARACTERS_HPP
