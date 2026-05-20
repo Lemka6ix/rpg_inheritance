@@ -1,0 +1,68 @@
+@startuml Lab3
+
+class Character
+{
+    -bool alive
+    -std::string name
+    -static int totalDamageDealt
+    -static Character* topDamageDealer
+    -int personalDamageDealt
+    -int damage
+
+    +virtual int attack
+    +virtual void takeDamage
+    +virtual bool isAlive
+    +virtual std::string getClassName
+    +std::string getName
+    +int getPersonalDamageDealt
+    +static int getTotalDamageDealt
+    +static Character* getTopDamageDealer
+    +void addDamage
+}
+
+class LivingCharacter
+{
+    -unsigned health
+    -unsigned maxHealth
+
+    +bool isAlive
+    +void takeDamage
+    +unsigned getHealth
+    +unsigned getMaxHealth
+    +std::string getClassName
+}
+
+class Warrior
+{
+    +int attack override
+    +std::string getClassName override
+}
+
+class Mage
+{
+    -unsigned mana
+    -unsigned maxMana
+    -unsigned spellCost
+
+    +bool hasEnoughMana
+    +int attack override
+    +unsigned getMana
+    +unsigned getMaxMana
+    +std::string getClassName override
+}
+
+class Battlemage
+{
+   +int attack override
+   +int physicalAttack
+   +int magicAttack
+   +std::string getClassName override
+}
+
+Character <|-- LivingCharacter
+LivingCharacter <|-- Warrior
+LivingCharacter <|-- Mage
+Warrior <|-- Battlemage
+Mage <|-- Battlemage 
+
+@enduml
