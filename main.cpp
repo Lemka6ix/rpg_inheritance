@@ -68,3 +68,95 @@ void testStaticMembers() {
     
     std::cout << "Static members test passed!" << std::endl << std::endl;
 }
+
+
+void testBattlemageAttacks() {
+    std::cout << "\ntestBattlemageAttacks" << std::endl;
+    
+    Battlemage bm("coolBattlemage", 100, 15, 25, 60, 10);
+
+    bm.physicalAttack();
+    bm.physicalAttack();
+
+    bm.magicAttack();
+    bm.magicAttack();
+
+    bm.attack();
+
+    Character* character = &bm;
+    character->attack();
+    
+    std::cout << "Battlemage attack test passed!" << std::endl;
+}
+
+void testCopyAndAssignment() {
+    std::cout << "\ntestCopyAndAssignment" << std::endl;
+    
+    Warrior originalWarrior("OriginalWarrior", 100, 15);
+    originalWarrior.attack();
+    Warrior copiedWarrior = originalWarrior;
+    
+    std::cout << "Original warrior damage dealt: " << originalWarrior.getPersonalDamageDealt() << std::endl;
+    std::cout << "Copied warrior damage dealt: " << copiedWarrior.getPersonalDamageDealt() << std::endl;
+
+    Mage mage1("Mage1", 80, 25, 100, 10);
+    mage1.attack();
+    Mage mage2("Mage2", 90, 30, 120, 15);
+    mage2 = mage1;
+    
+    std::cout << "Mage1 mana: " << mage1.getMana() << std::endl;
+    std::cout << "Mage2 mana: " << mage2.getMana() << std::endl;
+    
+    std::cout << "Copy and assignment test passed!" << std::endl << std::endl;
+}
+
+void testMultipleInheritance() {
+    std::cout << "\ntestMultipleInheritance" << std::endl;
+    
+    Battlemage bm("TestBattlemage", 100, 15, 20, 50, 8);
+    
+    std::cout << "Battlemage health: " << bm.getHealth() << std::endl;
+    std::cout << "Battlemage mana: " << bm.getMana() << std::endl;
+    
+    bm.attack();
+    std::cout << "Mana after attack: " << bm.getMana() << std::endl;
+    
+    Warrior& warriorRef = bm;
+    Mage& mageRef = bm;
+    
+    warriorRef.attack();
+    mageRef.attack();
+    
+    std::cout << "Multiple inheritance test passed!" << std::endl << std::endl;
+}
+
+void testAbstractClass() {
+    std::cout << "\ntestAbstractClass" << std::endl;
+    
+    Character* character = new Warrior("TestWarrior", 100, 15);
+    character->attack();
+    delete character;
+    
+    std::cout << "Abstract class test passed!" << std::endl << std::endl;
+}
+
+int main() {
+    try {
+        testBasicCreation();
+        testPolymorphism();
+        testCombat();
+        testStaticMembers();
+        testBattlemageAttacks();
+        testCopyAndAssignment();
+        testMultipleInheritance();
+        testAbstractClass();
+        
+        std::cout << "All tests passed successfully!" << std::endl;
+        
+    } catch (const std::exception& e) {
+        std::cerr << "Test failed with exception: " << e.what() << std::endl;
+        return 1;
+    }
+    
+    return 0;
+}
